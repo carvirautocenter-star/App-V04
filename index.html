@@ -1,0 +1,2150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Click Peças — Biblioteca Inteligente de Catálogos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0A1128;
+            --bg-card: #111C3A;
+            --bg-input: #1A2A4A;
+            --accent-yellow: #FFC107;
+            --accent-yellow-hover: #E0A800;
+            --accent-blue: #2196F3;
+            --accent-blue-hover: #1976D2;
+            --text-main: #FFFFFF;
+            --text-muted: #A0B0C8;
+            --border-color: #2A3C5A;
+            --success: #10B981;
+            --danger: #EF4444;
+            --radius: 14px;
+            --shadow: 0 8px 24px rgba(0,0,0,0.3);
+            --transition: all 0.25s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 80px;
+        }
+
+        /* HEADER */
+        header {
+            background: rgba(10, 17, 40, 0.95);
+            backdrop-filter: blur(12px);
+            padding: 12px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-area img {
+            height: 55px;
+            width: 55px;
+            object-fit: contain;
+            border-radius: 12px;
+            border: 3px solid var(--accent-yellow);
+            background: #fff;
+            padding: 4px;
+            transition: var(--transition);
+        }
+
+        .logo-area img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
+        }
+
+        .logo-text {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1;
+        }
+
+        .logo-text .click { color: var(--text-main); }
+        .logo-text .pecas { color: var(--accent-yellow); }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1.1rem;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* TELAS */
+        .screen {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+            flex: 1;
+        }
+
+        .screen.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* COMPONENTES */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--accent-yellow);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 14px rgba(255, 193, 7, 0.2);
+        }
+        .btn-primary:hover {
+            background: var(--accent-yellow-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary { background: var(--accent-blue); color: white; }
+        .btn-secondary:hover { background: var(--accent-blue-hover); transform: translateY(-2px); }
+
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; transform: translateY(-2px); }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: var(--text-muted); }
+
+        .btn-block { width: 100%; }
+        .btn-sm { padding: 8px 14px; font-size: 0.85rem; }
+
+        /* INPUTS */
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+            width: 100%;
+        }
+
+        .input-group input,
+        .input-group textarea,
+        .input-group select {
+            width: 100%;
+            padding: 20px 16px 8px 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius);
+            background: var(--bg-input);
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .input-group input { height: 60px; }
+        .input-group textarea { min-height: 100px; resize: vertical; padding-top: 24px; }
+
+        .input-group input:focus,
+        .input-group textarea:focus,
+        .input-group select:focus {
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .input-group textarea + label { top: 20px; transform: translateY(0); }
+
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label,
+        .input-group textarea:focus + label,
+        .input-group textarea:not(:placeholder-shown) + label,
+        .input-group select:focus + label,
+        .input-group select:valid + label {
+            top: 8px;
+            transform: translateY(0) scale(0.8);
+            color: var(--accent-yellow);
+            font-weight: 700;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(33, 150, 243, 0.15);
+            color: var(--accent-blue);
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+        .badge.yellow {
+            background: rgba(255, 193, 7, 0.15);
+            color: var(--accent-yellow);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        /* TELA HOME */
+        .hero-section {
+            text-align: center;
+            padding: 20px 0 10px;
+        }
+
+        .hero-section h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+        .hero-section p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+
+        .search-wrapper {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 60px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            padding: 0 120px 0 24px;
+            font-size: 1rem;
+            color: var(--text-main);
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-yellow);
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.1);
+        }
+
+        .search-input::placeholder { color: var(--text-muted); }
+
+        .search-actions {
+            position: absolute;
+            right: 8px;
+            top: 6px;
+            display: flex;
+            gap: 6px;
+            height: 48px;
+        }
+
+        .search-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            display: grid;
+            place-items: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .search-btn.mic { background: transparent; color: var(--text-muted); }
+        .search-btn.mic:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .search-btn.mic.listening { color: var(--danger); animation: pulse 1.2s infinite; }
+
+        .search-btn.submit { background: var(--accent-yellow); color: var(--bg-dark); }
+        .search-btn.submit:hover { background: var(--accent-yellow-hover); transform: scale(1.05); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .quick-searches {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 16px;
+            margin-bottom: 30px;
+        }
+
+        .chip {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .chip:hover {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .section-title-home {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title-home h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .section-title-home span {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* CARDS DE ITENS NA HOME */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-card:hover {
+            border-color: var(--accent-yellow);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .item-card-thumb {
+            width: 100%;
+            height: 160px;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .item-card-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-card-thumb .placeholder-icon {
+            font-size: 3rem;
+            color: var(--border-color);
+        }
+
+        .item-card-body {
+            padding: 14px 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .item-card-body .brand-tag {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .item-card-body h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        .item-card-body .code {
+            font-family: monospace;
+            color: var(--accent-yellow);
+            font-weight: 700;
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+
+        /* RESULTADOS DA BUSCA */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            padding: 18px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .result-card:hover {
+            border-color: var(--accent-yellow);
+            transform: translateY(-4px);
+        }
+        .result-card h3 { font-size: 1.1rem; margin: 8px 0 4px; }
+        .result-card .code { font-family: monospace; color: var(--accent-yellow); font-weight: 700; font-size: 0.9rem; }
+        .result-card .brand-tag { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* CATÁLOGO */
+        .catalog-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .catalog-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .catalog-layout { grid-template-columns: 1fr; }
+        }
+
+        .exploded-view-container {
+            position: relative;
+            background: #000;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exploded-image-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .exploded-image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .hotspot {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: var(--accent-yellow);
+            color: var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.4);
+            transition: var(--transition);
+            transform: translate(-50%, -50%);
+            border: 2px solid white;
+        }
+
+        .hotspot:hover, .hotspot.active {
+            transform: translate(-50%, -50%) scale(1.3);
+            background: #fff;
+            color: var(--accent-yellow);
+            z-index: 10;
+        }
+
+        .part-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .part-list-item:last-child { border-bottom: none; }
+        .part-list-item:hover, .part-list-item.active {
+            background: rgba(255, 193, 7, 0.05);
+            border-left: 3px solid var(--accent-yellow);
+        }
+
+        /* FICHA DA PEÇA */
+        .part-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .part-detail-header h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: 4px; }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .spec-item {
+            background: var(--bg-input);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+        .spec-item .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+        .spec-item .value { font-size: 0.95rem; font-weight: 600; margin-top: 4px; }
+
+        .media-container {
+            background: #000;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            margin-bottom: 20px;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-container img {
+            max-width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* ADMIN */
+        .tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--bg-input);
+            padding: 6px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: inherit;
+            white-space: nowrap;
+            min-width: fit-content;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .tab-btn.active { background: var(--bg-card); color: var(--accent-yellow); box-shadow: var(--shadow); }
+        .tab-btn:hover:not(.active) { color: var(--text-main); }
+
+        .tab-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tab-panel.active { display: block; }
+
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: rgba(255,255,255,0.02); }
+
+        .list-item-thumb {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-yellow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .list-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+        .list-item-info { flex: 1; min-width: 0; }
+        .list-item-info strong {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .list-item-info small {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .list-item-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+        .icon-action {
+            background: transparent;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        .icon-action:hover { background: rgba(255,255,255,0.05); color: var(--text-main); }
+        .icon-action.edit:hover { background: rgba(33, 150, 243, 0.15); color: var(--accent-blue); }
+        .icon-action.view:hover { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .icon-action.danger:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        /* UPLOAD */
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius);
+            padding: 30px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(255,255,255,0.02);
+            margin-bottom: 16px;
+        }
+        .upload-area:hover { border-color: var(--accent-yellow); background: rgba(255, 193, 7, 0.05); }
+        .upload-area.dragover { border-color: var(--accent-yellow); background: rgba(255, 193, 7, 0.1); }
+        .upload-area i { font-size: 2.5rem; color: var(--accent-yellow); margin-bottom: 12px; }
+        .upload-area p { font-weight: 600; margin-bottom: 4px; }
+        .upload-area small { color: var(--text-muted); }
+
+        .file-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+        }
+        .file-item i { color: var(--accent-blue); font-size: 1.1rem; }
+        .file-item .file-name { flex: 1; font-weight: 500; }
+        .file-item .remove-file {
+            background: transparent;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .file-item .remove-file:hover { background: rgba(239, 68, 68, 0.1); }
+
+        /* NAV */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(17, 28, 58, 0.95);
+            backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.7rem;
+            gap: 4px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 25%;
+            font-family: inherit;
+        }
+        .nav-item i { font-size: 1.3rem; }
+        .nav-item.active { color: var(--accent-yellow); }
+
+        /* MODAIS MELHORADOS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            padding: 20px;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            position: relative;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 12px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-header h3 i {
+            color: var(--accent-yellow);
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .modal-close:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .modal-footer .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* MODAL DE VISUALIZAÇÃO */
+        .view-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .view-item {
+            background: var(--bg-input);
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .view-item.full { grid-column: 1 / -1; }
+
+        .view-item .label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .view-item .value {
+            font-size: 0.95rem;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .view-image {
+            width: 100%;
+            max-height: 200px;
+            object-fit: contain;
+            border-radius: 10px;
+            background: #000;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        /* MODAL DE CONFIRMAÇÃO */
+        .confirm-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            margin: 0 auto 16px;
+        }
+
+        .confirm-text {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* RESPONSIVIDADE */
+        @media (min-width: 768px) {
+            .app-container { padding-bottom: 20px; }
+            .bottom-nav {
+                top: 0;
+                bottom: auto;
+                left: auto;
+                right: 20px;
+                width: auto;
+                background: transparent;
+                border: none;
+                padding: 16px 0;
+                gap: 8px;
+            }
+            .nav-item {
+                flex-direction: row;
+                width: auto;
+                padding: 8px 16px;
+                border-radius: var(--radius);
+                font-size: 0.85rem;
+            }
+            .nav-item.active { background: var(--bg-card); }
+        }
+
+        @media (max-width: 500px) {
+            .view-grid { grid-template-columns: 1fr; }
+            .modal-footer { flex-direction: column; }
+            .modal-footer .btn { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- HEADER -->
+    <header>
+        <a href="#" class="logo-area" onclick="switchTab('home'); return false;">
+            <img src="https://i.imgur.com/o7OeDOL_d.png?maxwidth=520&shape=thumb&fidelity=high" alt="Click Peças">
+            <div class="logo-text">
+                <span class="click">Click</span> <span class="pecas">Peças</span>
+            </div>
+        </a>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="switchTab('admin')" title="Painel Admin">
+                <i class="fas fa-user-shield"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- TELA HOME -->
+    <section id="screen-home" class="screen active">
+        <div class="hero-section">
+            <h1>O que você procura,<br><span style="color: var(--accent-yellow);">você encontra.</span></h1>
+            <p>Catálogos de peças na palma da sua mão.</p>
+        </div>
+
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Digite o código, peça, modelo ou fabricante..." autocomplete="off">
+            <div class="search-actions">
+                <button class="search-btn mic" id="micBtn" title="Pesquisa por voz"><i class="fas fa-microphone"></i></button>
+                <button class="search-btn submit" onclick="performSearch()"><i class="fas fa-search"></i></button>
+            </div>
+        </div>
+
+        <div class="quick-searches">
+            <span class="chip" onclick="quickSearch('Bomba hidráulica MF 265')">Bomba hidráulica MF 265</span>
+            <span class="chip" onclick="quickSearch('Filtro Valtra A985')">Filtro Valtra A985</span>
+            <span class="chip" onclick="quickSearch('Rolamento Valmet 138')">Rolamento Valmet 138</span>
+        </div>
+
+        <!-- RESULTADOS DA BUSCA (aparece só quando busca) -->
+        <div id="searchResults" style="display: none; margin-top: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.2rem;">Resultados encontrados</h2>
+                <button class="btn btn-outline btn-sm" onclick="clearSearch()"><i class="fas fa-arrow-left"></i> Nova busca</button>
+            </div>
+            <div id="resultsGrid" class="results-grid"></div>
+        </div>
+
+        <!-- LISTA DE ITENS EXISTENTES (SEMPRE VISÍVEL) -->
+        <div id="homeItemsList">
+            <div class="section-title-home">
+                <h2><i class="fas fa-list" style="color: var(--accent-yellow); margin-right: 8px;"></i>Itens Disponíveis</h2>
+                <span id="itemCount">0 itens</span>
+            </div>
+            <div id="itemsGrid" class="items-grid"></div>
+        </div>
+    </section>
+
+    <!-- TELA CATÁLOGO -->
+    <section id="screen-catalog" class="screen">
+        <div class="catalog-header">
+            <div>
+                <button class="btn btn-outline btn-sm" onclick="switchTab('home')"><i class="fas fa-arrow-left"></i> Voltar</button>
+                <h2 id="catalogTitle" style="display: inline-block; margin-left: 12px; font-size: 1.3rem;">Massey Ferguson 265 — Hidráulico</h2>
+            </div>
+            <span class="badge yellow"><i class="fas fa-microchip"></i> Vista Explodida</span>
+        </div>
+
+        <div class="catalog-layout">
+            <div>
+                <div class="exploded-view-container">
+                    <div class="exploded-image-wrapper" id="explodedWrapper">
+                        <img id="explodedImage" src="" alt="Vista Explodida">
+                    </div>
+                </div>
+                <p style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 10px;">
+                    <i class="fas fa-hand-pointer"></i> Clique nos números para ver os detalhes
+                </p>
+            </div>
+            <div class="card" style="margin: 0; padding: 10px;">
+                <h3 style="font-size: 1rem; margin-bottom: 10px; padding: 0 10px;"><i class="fas fa-list-ol"></i> Componentes</h3>
+                <div id="partsList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- TELA FICHA DA PEÇA -->
+    <section id="screen-part" class="screen">
+        <div style="margin-bottom: 16px;">
+            <button class="btn btn-outline btn-sm" onclick="switchTab('catalog')"><i class="fas fa-arrow-left"></i> Voltar ao catálogo</button>
+        </div>
+
+        <div class="card">
+            <div class="part-detail-header">
+                <div>
+                    <span class="badge" id="partPositionBadge">Posição 01</span>
+                    <h1 id="partName">Bomba Hidráulica Principal</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Código: <strong style="color: var(--accent-yellow);" id="partCode">MF-3147130</strong></p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="toggleFavorite()" id="favBtn"><i class="far fa-star"></i> Salvar</button>
+            </div>
+
+            <div class="media-container" id="partMediaContainer">
+                <img id="partImage" src="" alt="Imagem da Peça">
+            </div>
+
+            <h4 style="margin-bottom: 12px;"><i class="fas fa-sliders-h" style="color: var(--accent-yellow);"></i> Especificações</h4>
+            <div class="specs-grid" id="partSpecs"></div>
+
+            <h4 style="margin: 16px 0 8px;"><i class="fas fa-check-circle" style="color: var(--success);"></i> Aplicação</h4>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" id="partCompat"></p>
+
+            <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+                <button class="btn btn-primary" style="flex: 1;" onclick="openQuoteModal()"><i class="fas fa-cart-shopping"></i> Solicitar Orçamento</button>
+                <button class="btn btn-outline" style="flex: 1;" onclick="copyCode()"><i class="fas fa-copy"></i> Copiar Código</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- TELA FAVORITOS -->
+    <section id="screen-favorites" class="screen">
+        <h2 style="margin-bottom: 20px;">Itens Salvos</h2>
+        <div id="favoritesList" class="results-grid">
+            <p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Nenhum item salvo ainda.</p>
+        </div>
+    </section>
+
+    <!-- TELA ADMIN -->
+    <section id="screen-admin" class="screen">
+        <div style="margin-bottom: 20px;">
+            <button class="btn btn-outline btn-sm" onclick="switchTab('home')"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <h2 style="display: inline-block; margin-left: 12px;">Painel Administrativo</h2>
+        </div>
+
+        <div class="tabs" id="adminTabs">
+            <button class="tab-btn active" data-tab="tab-machines"><i class="fas fa-tractor"></i> Máquinas</button>
+            <button class="tab-btn" data-tab="tab-catalogs"><i class="fas fa-book"></i> Catálogos</button>
+            <button class="tab-btn" data-tab="tab-parts"><i class="fas fa-cog"></i> Peças</button>
+            <button class="tab-btn" data-tab="tab-media"><i class="fas fa-images"></i> Mídias</button>
+        </div>
+
+        <!-- MÁQUINAS -->
+        <div class="tab-panel active" id="tab-machines">
+            <div class="card">
+                <h3 style="margin-bottom: 16px;"><i class="fas fa-plus-circle" style="color: var(--accent-yellow);"></i> Nova Máquina</h3>
+                <div class="input-group">
+                    <input type="text" id="machineBrand" placeholder=" ">
+                    <label>Marca</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="machineModel" placeholder=" ">
+                    <label>Modelo</label>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="input-group">
+                        <input type="text" id="machineYear" placeholder=" ">
+                        <label>Ano</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="machineCategory" placeholder=" ">
+                        <label>Categoria</label>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="addMachine()"><i class="fas fa-save"></i> Cadastrar</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 12px;"><i class="fas fa-list"></i> Máquinas</h3>
+                <div id="machineList"></div>
+            </div>
+        </div>
+
+        <!-- CATÁLOGOS -->
+        <div class="tab-panel" id="tab-catalogs">
+            <div class="card">
+                <h3 style="margin-bottom: 16px;"><i class="fas fa-plus-circle" style="color: var(--accent-yellow);"></i> Novo Catálogo</h3>
+                <div class="input-group">
+                    <select id="catalogMachine">
+                        <option value=""></option>
+                        <option value="Massey Ferguson 265">Massey Ferguson 265</option>
+                        <option value="Valtra A985">Valtra A985</option>
+                        <option value="Valmet 138">Valmet 138</option>
+                        <option value="John Deere 6110J">John Deere 6110J</option>
+                    </select>
+                    <label>Máquina</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="catalogSystem" placeholder=" ">
+                    <label>Sistema</label>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="catalogGroup" placeholder=" ">
+                    <label>Grupo</label>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="addCatalog()"><i class="fas fa-save"></i> Cadastrar</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 12px;"><i class="fas fa-list"></i> Catálogos</h3>
+                <div id="catalogAdminList"></div>
+            </div>
+        </div>
+
+        <!-- PEÇAS -->
+        <div class="tab-panel" id="tab-parts">
+            <div class="card">
+                <h3 style="margin-bottom: 16px;"><i class="fas fa-plus-circle" style="color: var(--accent-yellow);"></i> Nova Peça</h3>
+                <div class="input-group">
+                    <input type="text" id="partNameInput" placeholder=" ">
+                    <label>Nome da Peça</label>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="input-group">
+                        <input type="text" id="partCodeInput" placeholder=" ">
+                        <label>Código</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="partPositionInput" placeholder=" ">
+                        <label>Posição</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="partApplicationInput" placeholder=" ">
+                    <label>Aplicação</label>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="input-group">
+                        <input type="text" id="partTypeInput" placeholder=" ">
+                        <label>Tipo</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="partOemInput" placeholder=" ">
+                        <label>OEM</label>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <textarea id="partDescInput" placeholder=" "></textarea>
+                    <label>Descrição</label>
+                </div>
+                <button class="btn btn-primary btn-block" onclick="addPart()"><i class="fas fa-save"></i> Cadastrar</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 12px;"><i class="fas fa-list"></i> Peças</h3>
+                <div id="partAdminList"></div>
+            </div>
+        </div>
+
+        <!-- MÍDIAS -->
+        <div class="tab-panel" id="tab-media">
+            <div class="card">
+                <h3 style="margin-bottom: 16px;"><i class="fas fa-cloud-upload-alt" style="color: var(--accent-yellow);"></i> Upload</h3>
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-file-arrow-up"></i>
+                    <p>Arraste ou clique para enviar</p>
+                    <small>Imagens · PDFs · até 10MB</small>
+                    <input type="file" id="fileInput" multiple accept="image/*,.pdf" hidden>
+                </div>
+                <div class="file-list" id="fileList"></div>
+                <button class="btn btn-primary btn-block" onclick="saveMedia()"><i class="fas fa-cloud-upload-alt"></i> Salvar Mídias</button>
+            </div>
+            <div class="card">
+                <h3 style="margin-bottom: 12px;"><i class="fas fa-photo-video"></i> Galeria</h3>
+                <div id="galleryList"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NAV -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('home')" id="nav-home">
+            <i class="fas fa-search"></i><span>Buscar</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('catalog')" id="nav-catalog">
+            <i class="fas fa-book-open"></i><span>Catálogos</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('favorites')" id="nav-favorites">
+            <i class="fas fa-star"></i><span>Salvos</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('admin')" id="nav-admin">
+            <i class="fas fa-user-shield"></i><span>Admin</span>
+        </button>
+    </nav>
+</div>
+
+<!-- MODAL DE VISUALIZAÇÃO -->
+<div class="modal-overlay" id="viewModal" onclick="closeModalOutside(event, 'viewModal')">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-eye"></i> Visualizar</h3>
+            <button class="modal-close" onclick="closeModal('viewModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="viewModalBody"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('viewModal')">Fechar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE EDIÇÃO -->
+<div class="modal-overlay" id="editModal" onclick="closeModalOutside(event, 'editModal')">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-pen"></i> Editar</h3>
+            <button class="modal-close" onclick="closeModal('editModal')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="editModalBody"></div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('editModal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveEdit()"><i class="fas fa-save"></i> Salvar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO (EXCLUSÃO) -->
+<div class="modal-overlay" id="confirmModal" onclick="closeModalOutside(event, 'confirmModal')">
+    <div class="modal-content" style="max-width: 420px;">
+        <div class="modal-body">
+            <div class="confirm-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <h3 style="text-align: center; margin-bottom: 8px;">Confirmar Exclusão</h3>
+            <p class="confirm-text" id="confirmText">Tem certeza que deseja excluir este item?</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-outline" onclick="closeModal('confirmModal')">Cancelar</button>
+            <button class="btn btn-danger" id="confirmBtn"><i class="fas fa-trash"></i> Excluir</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ==========================================================================
+       BANCO DE DADOS
+       ========================================================================== */
+    const database = {
+        explodedImages: {
+            'Hidráulico': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10',
+            'Motor': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwXwaOkLVHVPJBpKYSKrOrFi0LFxroBaE3YOLSdowrA&s=10',
+            'Transmissão': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEewGJDvanguB6uCm8d9pCzY3YSwk06h4jpOf8g5aEQ&s=10',
+            'Eixo dianteiro': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10'
+        },
+        parts: [
+            { id: 1, brand: "Massey Ferguson", model: "265", system: "Hidráulico", name: "Bomba Hidráulica Principal", code: "MF-3147130", position: 1, type: "Engrenagem", oem: "MF-3147130", desc: "Vazão 42 L/min · 175 Bar", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10", compatibility: "Massey Ferguson 265, 275, 290" },
+            { id: 2, brand: "Massey Ferguson", model: "265", system: "Hidráulico", name: "Engrenagem do Comando", code: "MF-023199", position: 2, type: "Aço Cementado", oem: "MF-023199", desc: "24 Dentes", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwXwaOkLVHVPJBpKYSKrOrFi0LFxroBaE3YOLSdowrA&s=10", compatibility: "Massey Ferguson 265, 275" },
+            { id: 3, brand: "Massey Ferguson", model: "265", system: "Hidráulico", name: "Retentor do Eixo", code: "MF-3125542", position: 3, type: "NBR", oem: "MF-3125542", desc: "Vedação do eixo", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEewGJDvanguB6uCm8d9pCzY3YSwk06h4jpOf8g5aEQ&s=10", compatibility: "Massey Ferguson 265" },
+            { id: 4, brand: "Massey Ferguson", model: "265", system: "Hidráulico", name: "Rolamento Rígido", code: "MF-3125543", position: 4, type: "Esferas", oem: "MF-3125543", desc: "SKF 6205", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10", compatibility: "Massey Ferguson 265" },
+            { id: 5, brand: "Massey Ferguson", model: "265", system: "Hidráulico", name: "Junta da Carcaça", code: "MF-3125544", position: 5, type: "Papelão Hidráulico", oem: "MF-3125544", desc: "Vedação da carcaça", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10", compatibility: "Massey Ferguson 265" },
+            { id: 6, brand: "Valtra", model: "A985", system: "Motor", name: "Filtro de Óleo", code: "VAL-A985-FO-001", position: 1, type: "Filtro", oem: "VAL-A985-FO-001", desc: "Filtro de óleo do motor", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwXwaOkLVHVPJBpKYSKrOrFi0LFxroBaE3YOLSdowrA&s=10", compatibility: "Valtra A985, A990" },
+            { id: 7, brand: "Valtra", model: "A985", system: "Motor", name: "Pistão e Anéis", code: "VAL-A985-PIS-002", position: 2, type: "Conjunto", oem: "VAL-A985-PIS-002", desc: "Pistão forjado", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEewGJDvanguB6uCm8d9pCzY3YSwk06h4jpOf8g5aEQ&s=10", compatibility: "Valtra A985" },
+            { id: 8, brand: "Valtra", model: "A985", system: "Motor", name: "Válvula de Admissão", code: "VAL-A985-VAL-003", position: 3, type: "Válvula", oem: "VAL-A985-VAL-003", desc: "Aço inoxidável", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10", compatibility: "Valtra A985" },
+            { id: 9, brand: "Valmet", model: "138", system: "Transmissão", name: "Rolamento do Cubo", code: "VALM-138-ROL-001", position: 1, type: "Rolamento", oem: "VALM-138-ROL-001", desc: "Rolamento do cubo", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10", compatibility: "Valmet 138, 148" },
+            { id: 10, brand: "Valmet", model: "138", system: "Transmissão", name: "Engrenagem da Redução", code: "VALM-138-ENG-002", position: 2, type: "Engrenagem", oem: "VALM-138-ENG-002", desc: "Relação 3.5:1", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10", compatibility: "Valmet 138" },
+            { id: 11, brand: "Valmet", model: "138", system: "Transmissão", name: "Eixo Cardan", code: "VALM-138-EIX-003", position: 3, type: "Eixo", oem: "VALM-138-EIX-003", desc: "Aço temperado", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwXwaOkLVHVPJBpKYSKrOrFi0LFxroBaE3YOLSdowrA&s=10", compatibility: "Valmet 138" },
+            { id: 12, brand: "John Deere", model: "6110J", system: "Eixo dianteiro", name: "Manga de Eixo", code: "JD-6110J-MAN-001", position: 1, type: "Fundido", oem: "JD-6110J-MAN-001", desc: "Ferro fundido nodular", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEewGJDvanguB6uCm8d9pCzY3YSwk06h4jpOf8g5aEQ&s=10", compatibility: "John Deere 6110J, 6115J" },
+            { id: 13, brand: "John Deere", model: "6110J", system: "Eixo dianteiro", name: "Cubo de Roda", code: "JD-6110J-CUB-002", position: 2, type: "Cubo", oem: "JD-6110J-CUB-002", desc: "Com rolamentos", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10", compatibility: "John Deere 6110J" },
+            { id: 14, brand: "John Deere", model: "6110J", system: "Eixo dianteiro", name: "Pino de Articulação", code: "JD-6110J-PIN-003", position: 3, type: "Pino", oem: "JD-6110J-PIN-003", desc: "Aço cromado", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10", compatibility: "John Deere 6110J" }
+        ],
+        machines: [
+            { id: 'massey265', brand: 'Massey Ferguson', model: '265', year: '1980-1990', category: 'Trator Agrícola' },
+            { id: 'valtraa985', brand: 'Valtra', model: 'A985', year: '2015-2022', category: 'Trator Agrícola' },
+            { id: 'valmet138', brand: 'Valmet', model: '138', year: '1990-2000', category: 'Trator Agrícola' },
+            { id: 'jd6110j', brand: 'John Deere', model: '6110J', year: '2010-2020', category: 'Trator Agrícola' }
+        ],
+        catalogs: [
+            { id: 1, machine: 'Massey Ferguson 265', system: 'Hidráulico', group: 'Bomba e Engrenagens' },
+            { id: 2, machine: 'Valtra A985', system: 'Motor', group: 'Filtros e Pistões' },
+            { id: 3, machine: 'Valmet 138', system: 'Transmissão', group: 'Redução e Eixos' },
+            { id: 4, machine: 'John Deere 6110J', system: 'Eixo dianteiro', group: 'Manga e Cubo' }
+        ],
+        media: [
+            { id: 1, name: 'vista_explodida_hidraulico.jpg', type: 'image', size: '2.4 MB', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNWI31jbD03IPSFFqEg5swW7qzp5oucrEOyo0CthLXkw&s=10' },
+            { id: 2, name: 'vista_explodida_motor.jpg', type: 'image', size: '1.8 MB', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSfwXwaOkLVHVPJBpKYSKrOrFi0LFxroBaE3YOLSdowrA&s=10' },
+            { id: 3, name: 'vista_explodida_transmissao.jpg', type: 'image', size: '2.1 MB', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQCEewGJDvanguB6uCm8d9pCzY3YSwk06h4jpOf8g5aEQ&s=10' },
+            { id: 4, name: 'vista_explodida_eixo.jpg', type: 'image', size: '1.9 MB', url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQv-25dsAKRJHDzpy2ScQZwqkf8UaqHY_TOoXh7STIvnQ&s=10' }
+        ]
+    };
+
+    /* ==========================================================================
+       ESTADO
+       ========================================================================== */
+    let currentMachine = 'massey265';
+    let currentSystem = 'Hidráulico';
+    let currentPart = null;
+    let favorites = JSON.parse(localStorage.getItem('clickPecasFavorites') || '[]');
+    let uploadedFiles = [];
+    let editingContext = null; // { type, id }
+
+    /* ==========================================================================
+       NAVEGAÇÃO
+       ========================================================================== */
+    function switchTab(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`screen-${screenId}`);
+        if (target) target.classList.add('active');
+
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const nav = document.getElementById(`nav-${screenId}`);
+        if (nav) nav.classList.add('active');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        if (screenId === 'home') renderHomeItems();
+        if (screenId === 'favorites') renderFavorites();
+        if (screenId === 'admin') renderAdminLists();
+    }
+
+    /* ==========================================================================
+       MODAIS
+       ========================================================================== */
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('active');
+    }
+
+    function closeModalOutside(event, id) {
+        if (event.target.id === id) closeModal(id);
+    }
+
+    function openViewModal(title, bodyHTML) {
+        document.getElementById('viewModalBody').innerHTML = bodyHTML;
+        document.querySelector('#viewModal .modal-header h3').innerHTML = `<i class="fas fa-eye"></i> ${title}`;
+        document.getElementById('viewModal').classList.add('active');
+    }
+
+    function openEditModal(title, bodyHTML, context) {
+        editingContext = context;
+        document.getElementById('editModalBody').innerHTML = bodyHTML;
+        document.querySelector('#editModal .modal-header h3').innerHTML = `<i class="fas fa-pen"></i> ${title}`;
+        document.getElementById('editModal').classList.add('active');
+    }
+
+    function openConfirmModal(text, onConfirm) {
+        document.getElementById('confirmText').textContent = text;
+        const btn = document.getElementById('confirmBtn');
+        // Remove listener antigo
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+        newBtn.addEventListener('click', () => {
+            onConfirm();
+            closeModal('confirmModal');
+        });
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    /* ==========================================================================
+       HOME — LISTA DE ITENS
+       ========================================================================== */
+    function renderHomeItems() {
+        const grid = document.getElementById('itemsGrid');
+        const count = document.getElementById('itemCount');
+
+        // Pega todos os itens únicos (agrupados por peça)
+        const items = database.parts;
+        count.textContent = `${items.length} itens`;
+
+        grid.innerHTML = '';
+        items.forEach(part => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.onclick = () => openPartById(part.id);
+            card.innerHTML = `
+                <div class="item-card-thumb">
+                    ${part.image ? `<img src="${part.image}" alt="${part.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-cog placeholder-icon\\'></i>';">` : `<i class="fas fa-cog placeholder-icon"></i>`}
+                </div>
+                <div class="item-card-body">
+                    <span class="brand-tag">${part.brand} ${part.model}</span>
+                    <h3>${part.name}</h3>
+                    <span class="badge" style="align-self: flex-start; margin-top: 4px;">${part.system}</span>
+                    <div class="code">${part.code}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    /* ==========================================================================
+       BUSCA
+       ========================================================================== */
+    function normalize(text) {
+        return text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    }
+
+    function performSearch() {
+        const input = document.getElementById('searchInput');
+        const query = input.value.trim();
+        if (!query) { input.focus(); return; }
+
+        const q = normalize(query);
+        const words = q.split(/\s+/).filter(Boolean);
+
+        const results = database.parts.filter(part => {
+            const searchable = normalize(`${part.brand} ${part.model} ${part.system} ${part.name} ${part.code} ${part.type}`);
+            let matches = 0;
+            words.forEach(word => {
+                if (searchable.includes(word)) matches++;
+                else {
+                    const first = word.substring(0, 4);
+                    if (first.length >= 3 && searchable.includes(first)) matches++;
+                }
+            });
+            return matches >= Math.max(1, Math.ceil(words.length * 0.35));
+        });
+
+        document.getElementById('searchResults').style.display = 'block';
+        document.getElementById('homeItemsList').style.display = 'none';
+
+        const grid = document.getElementById('resultsGrid');
+        grid.innerHTML = '';
+
+        if (results.length === 0) {
+            grid.innerHTML = `<div class="card" style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                <i class="fas fa-search" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 16px;"></i>
+                <h3>Nenhuma peça encontrada</h3>
+                <p style="color: var(--text-muted); margin-top: 8px;">Tente outro termo.</p>
+            </div>`;
+            return;
+        }
+
+        results.forEach(part => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.onclick = () => openPartById(part.id);
+            card.innerHTML = `
+                <div class="item-card-thumb">
+                    ${part.image ? `<img src="${part.image}" alt="${part.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\\'fas fa-cog placeholder-icon\\'></i>';">` : `<i class="fas fa-cog placeholder-icon"></i>`}
+                </div>
+                <div class="item-card-body">
+                    <span class="brand-tag">${part.brand} ${part.model}</span>
+                    <h3>${part.name}</h3>
+                    <span class="badge" style="align-self: flex-start; margin-top: 4px;">${part.system}</span>
+                    <div class="code">${part.code}</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function quickSearch(text) {
+        document.getElementById('searchInput').value = text;
+        performSearch();
+    }
+
+    function clearSearch() {
+        document.getElementById('searchResults').style.display = 'none';
+        document.getElementById('homeItemsList').style.display = 'block';
+        document.getElementById('searchInput').value = '';
+    }
+
+    /* ==========================================================================
+       VOZ
+       ========================================================================== */
+    function startVoice() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { alert('Navegador sem suporte a voz.'); return; }
+        const recognition = new SR();
+        recognition.lang = 'pt-BR';
+        const btn = document.getElementById('micBtn');
+        btn.classList.add('listening');
+        recognition.start();
+        recognition.onresult = (e) => {
+            document.getElementById('searchInput').value = e.results[0][0].transcript;
+            performSearch();
+        };
+        recognition.onerror = () => alert('Erro ao reconhecer fala.');
+        recognition.onend = () => btn.classList.remove('listening');
+    }
+
+    /* ==========================================================================
+       CATÁLOGO
+       ========================================================================== */
+    const fallbackSVG = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2MDAiIGhlaWdodD0iNDAwIiB2aWV3Qm94PSIwIDAgNjAwIDQwMCI+PHJlY3Qgd2lkdGg9IjYwMCIgaGVpZ2h0PSI0MDAiIGZpbGw9IiMxYTI0NEEiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjAiIGZpbGw9IiM0NDU1NzciIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5JbWFnZW0gZGEgVmlzdGEgRXhwbG9kaWRhPC90ZXh0PjxjaXJjbGUgY3g9IjE1MCIgY3k9IjE1MCIgcj0iNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0ZGQzEwNyIgc3Ryb2tlLXdpZHRoPSI0Ii8+PHJlY3QgeD0iMjUwIiB5PSIxMjAiIHdpZHRoPSI4MCIgaGVpZ2h0PSI2MCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMjE5NkYzIiBzdHJva2Utd2lkdGg9IjQiLz48bGluZSB4MT0iMzUwIiB5MT0iMTUwIiB4Mj0iNDUwIiB5Mj0iMTUwIiBzdHJva2U9IiMxMEI5ODEiIHN0cm9rZS13aWR0aD0iNiIvPjwvc3ZnPg==";
+
+    const hotspotPositions = {
+        'Hidráulico': [
+            { pos: 1, top: '28%', left: '20%' },
+            { pos: 2, top: '42%', left: '48%' },
+            { pos: 3, top: '65%', left: '30%' },
+            { pos: 4, top: '55%', left: '72%' },
+            { pos: 5, top: '78%', left: '58%' }
+        ],
+        'Motor': [
+            { pos: 1, top: '30%', left: '25%' },
+            { pos: 2, top: '50%', left: '50%' },
+            { pos: 3, top: '70%', left: '75%' }
+        ],
+        'Transmissão': [
+            { pos: 1, top: '35%', left: '30%' },
+            { pos: 2, top: '55%', left: '60%' },
+            { pos: 3, top: '75%', left: '40%' }
+        ],
+        'Eixo dianteiro': [
+            { pos: 1, top: '30%', left: '20%' },
+            { pos: 2, top: '50%', left: '50%' },
+            { pos: 3, top: '70%', left: '80%' }
+        ]
+    };
+
+    function openCatalog(machineId, systemName) {
+        currentMachine = machineId || 'massey265';
+        currentSystem = systemName || 'Hidráulico';
+
+        const machine = database.machines.find(m => m.id === currentMachine) || database.machines[0];
+        document.getElementById('catalogTitle').textContent = `${machine.brand} ${machine.model} — ${currentSystem}`;
+
+        const img = document.getElementById('explodedImage');
+        img.src = database.explodedImages[currentSystem] || database.explodedImages['Hidráulico'];
+        img.onerror = function() { this.src = fallbackSVG; };
+
+        const wrapper = document.getElementById('explodedWrapper');
+        wrapper.querySelectorAll('.hotspot').forEach(h => h.remove());
+
+        const positions = hotspotPositions[currentSystem] || hotspotPositions['Hidráulico'];
+        positions.forEach(({ pos, top, left }) => {
+            const hotspot = document.createElement('div');
+            hotspot.className = 'hotspot';
+            hotspot.textContent = String(pos).padStart(2, '0');
+            hotspot.style.top = top;
+            hotspot.style.left = left;
+            hotspot.onclick = () => openPartByPosition(pos);
+            wrapper.appendChild(hotspot);
+        });
+
+        const partsList = document.getElementById('partsList');
+        partsList.innerHTML = '';
+        const parts = database.parts.filter(p => p.system === currentSystem && p.model === machine.model);
+
+        if (parts.length === 0) {
+            partsList.innerHTML = '<p style="color: var(--text-muted); padding: 16px; text-align: center;">Nenhuma peça cadastrada.</p>';
+        } else {
+            parts.forEach(part => {
+                const div = document.createElement('div');
+                div.className = 'part-list-item';
+                div.onclick = () => openPartById(part.id);
+                div.innerHTML = `
+                    <div>
+                        <strong style="font-size: 0.9rem;">0${part.position}. ${part.name}</strong>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">Cód: ${part.code}</div>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                `;
+                partsList.appendChild(div);
+            });
+        }
+
+        switchTab('catalog');
+    }
+
+    function openPartByPosition(position) {
+        const part = database.parts.find(p => p.position === position && p.system === currentSystem);
+        if (part) openPartById(part.id);
+    }
+
+    function openPartById(id) {
+        const part = database.parts.find(p => p.id === id);
+        if (!part) return;
+        currentPart = part;
+
+        document.getElementById('partPositionBadge').textContent = `Posição 0${part.position}`;
+        document.getElementById('partName').textContent = part.name;
+        document.getElementById('partCode').textContent = part.code;
+        document.getElementById('partCompat').textContent = part.compatibility;
+
+        const img = document.getElementById('partImage');
+        img.src = part.image || fallbackSVG;
+        img.onerror = function() { this.src = fallbackSVG; };
+
+        document.getElementById('partSpecs').innerHTML = `
+            <div class="spec-item"><div class="label">Fabricante</div><div class="value">${part.brand}</div></div>
+            <div class="spec-item"><div class="label">Aplicação</div><div class="value">${part.model}</div></div>
+            <div class="spec-item"><div class="label">Tipo</div><div class="value">${part.type}</div></div>
+            <div class="spec-item"><div class="label">OEM</div><div class="value">${part.oem}</div></div>
+            <div class="spec-item" style="grid-column: 1/-1;"><div class="label">Descrição</div><div class="value">${part.desc}</div></div>
+        `;
+
+        updateFavoriteButton();
+        switchTab('part');
+    }
+
+    /* ==========================================================================
+       FAVORITOS
+       ========================================================================== */
+    function toggleFavorite() {
+        if (!currentPart) return;
+        const i = favorites.findIndex(f => f.id === currentPart.id);
+        if (i > -1) favorites.splice(i, 1);
+        else favorites.push(currentPart);
+        localStorage.setItem('clickPecasFavorites', JSON.stringify(favorites));
+        updateFavoriteButton();
+    }
+
+    function updateFavoriteButton() {
+        if (!currentPart) return;
+        const btn = document.getElementById('favBtn');
+        const isFav = favorites.some(f => f.id === currentPart.id);
+        btn.innerHTML = isFav ? '<i class="fas fa-star" style="color: var(--accent-yellow);"></i> Salvo' : '<i class="far fa-star"></i> Salvar';
+    }
+
+    function renderFavorites() {
+        const container = document.getElementById('favoritesList');
+        if (favorites.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted); text-align: center; grid-column: 1/-1;">Nenhum item salvo.</p>`;
+            return;
+        }
+        container.innerHTML = '';
+        favorites.forEach(part => {
+            const card = document.createElement('div');
+            card.className = 'item-card';
+            card.onclick = () => openPartById(part.id);
+            card.innerHTML = `
+                <div class="item-card-thumb">
+                    ${part.image ? `<img src="${part.image}" alt="${part.name}">` : `<i class="fas fa-cog placeholder-icon"></i>`}
+                </div>
+                <div class="item-card-body">
+                    <span class="brand-tag">${part.brand} ${part.model}</span>
+                    <h3>${part.name}</h3>
+                    <div class="code">${part.code}</div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    /* ==========================================================================
+       ADMIN — MÁQUINAS (CRUD)
+       ========================================================================== */
+    function addMachine() {
+        const brand = document.getElementById('machineBrand').value.trim();
+        const model = document.getElementById('machineModel').value.trim();
+        const year = document.getElementById('machineYear').value.trim() || '—';
+        const category = document.getElementById('machineCategory').value.trim() || 'Trator Agrícola';
+        if (!brand || !model) { alert('Preencha marca e modelo.'); return; }
+        const id = (brand + model).toLowerCase().replace(/\s/g, '');
+        database.machines.push({ id, brand, model, year, category });
+        renderMachineList();
+        document.getElementById('machineBrand').value = '';
+        document.getElementById('machineModel').value = '';
+        document.getElementById('machineYear').value = '';
+        document.getElementById('machineCategory').value = '';
+    }
+
+    function viewMachine(id) {
+        const m = database.machines.find(x => x.id === id);
+        if (!m) return;
+        openViewModal('Máquina', `
+            <div class="view-grid">
+                <div class="view-item"><div class="label">Marca</div><div class="value">${m.brand}</div></div>
+                <div class="view-item"><div class="label">Modelo</div><div class="value">${m.model}</div></div>
+                <div class="view-item"><div class="label">Ano</div><div class="value">${m.year}</div></div>
+                <div class="view-item"><div class="label">Categoria</div><div class="value">${m.category}</div></div>
+            </div>
+        `);
+    }
+
+    function editMachine(id) {
+        const m = database.machines.find(x => x.id === id);
+        if (!m) return;
+        openEditModal('Editar Máquina', `
+            <div class="input-group"><input type="text" id="edit_m_brand" value="${m.brand}" placeholder=" "><label>Marca</label></div>
+            <div class="input-group"><input type="text" id="edit_m_model" value="${m.model}" placeholder=" "><label>Modelo</label></div>
+            <div class="input-group"><input type="text" id="edit_m_year" value="${m.year}" placeholder=" "><label>Ano</label></div>
+            <div class="input-group"><input type="text" id="edit_m_category" value="${m.category}" placeholder=" "><label>Categoria</label></div>
+        `, { type: 'machine', id });
+    }
+
+    function deleteMachine(id) {
+        openConfirmModal('Tem certeza que deseja excluir esta máquina?', () => {
+            database.machines = database.machines.filter(m => m.id !== id);
+            renderMachineList();
+        });
+    }
+
+    function renderMachineList() {
+        const list = document.getElementById('machineList');
+        if (database.machines.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhuma máquina.</p>';
+            return;
+        }
+        list.innerHTML = database.machines.map(m => `
+            <div class="list-item">
+                <div class="list-item-thumb"><i class="fas fa-tractor"></i></div>
+                <div class="list-item-info">
+                    <strong>${m.brand} ${m.model}</strong>
+                    <small>${m.year} · ${m.category}</small>
+                </div>
+                <div class="list-item-actions">
+                    <button class="icon-action view" onclick="viewMachine('${m.id}')" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="icon-action edit" onclick="editMachine('${m.id}')" title="Editar"><i class="fas fa-pen"></i></button>
+                    <button class="icon-action danger" onclick="deleteMachine('${m.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ==========================================================================
+       ADMIN — CATÁLOGOS (CRUD)
+       ========================================================================== */
+    function addCatalog() {
+        const machine = document.getElementById('catalogMachine').value;
+        const system = document.getElementById('catalogSystem').value.trim();
+        const group = document.getElementById('catalogGroup').value.trim();
+        if (!machine || !system) { alert('Preencha os campos.'); return; }
+        database.catalogs.push({ id: Date.now(), machine, system, group: group || '—' });
+        renderCatalogAdminList();
+        document.getElementById('catalogSystem').value = '';
+        document.getElementById('catalogGroup').value = '';
+    }
+
+    function viewCatalog(id) {
+        const c = database.catalogs.find(x => x.id === id);
+        if (!c) return;
+        openViewModal('Catálogo', `
+            <div class="view-grid">
+                <div class="view-item"><div class="label">Sistema</div><div class="value">${c.system}</div></div>
+                <div class="view-item"><div class="label">Máquina</div><div class="value">${c.machine}</div></div>
+                <div class="view-item full"><div class="label">Grupo</div><div class="value">${c.group}</div></div>
+            </div>
+        `);
+    }
+
+    function editCatalog(id) {
+        const c = database.catalogs.find(x => x.id === id);
+        if (!c) return;
+        openEditModal('Editar Catálogo', `
+            <div class="input-group"><input type="text" id="edit_c_system" value="${c.system}" placeholder=" "><label>Sistema</label></div>
+            <div class="input-group"><input type="text" id="edit_c_group" value="${c.group}" placeholder=" "><label>Grupo</label></div>
+        `, { type: 'catalog', id });
+    }
+
+    function deleteCatalog(id) {
+        openConfirmModal('Tem certeza que deseja excluir este catálogo?', () => {
+            database.catalogs = database.catalogs.filter(c => c.id !== id);
+            renderCatalogAdminList();
+        });
+    }
+
+    function renderCatalogAdminList() {
+        const list = document.getElementById('catalogAdminList');
+        if (database.catalogs.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhum catálogo.</p>';
+            return;
+        }
+        list.innerHTML = database.catalogs.map(c => `
+            <div class="list-item">
+                <div class="list-item-thumb"><i class="fas fa-book"></i></div>
+                <div class="list-item-info">
+                    <strong>${c.system}</strong>
+                    <small>${c.machine} · ${c.group}</small>
+                </div>
+                <div class="list-item-actions">
+                    <button class="icon-action view" onclick="viewCatalog(${c.id})" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="icon-action edit" onclick="editCatalog(${c.id})" title="Editar"><i class="fas fa-pen"></i></button>
+                    <button class="icon-action danger" onclick="deleteCatalog(${c.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ==========================================================================
+       ADMIN — PEÇAS (CRUD)
+       ========================================================================== */
+    function addPart() {
+        const name = document.getElementById('partNameInput').value.trim();
+        const code = document.getElementById('partCodeInput').value.trim();
+        const position = document.getElementById('partPositionInput').value.trim();
+        const app = document.getElementById('partApplicationInput').value.trim();
+        const type = document.getElementById('partTypeInput').value.trim();
+        const oem = document.getElementById('partOemInput').value.trim();
+        const desc = document.getElementById('partDescInput').value.trim();
+        if (!name || !code) { alert('Preencha nome e código.'); return; }
+
+        database.parts.push({
+            id: Date.now(),
+            brand: 'Cadastrada', model: 'Geral', system: 'Geral',
+            name, code,
+            position: position ? parseInt(position) : 1,
+            type: type || '—', oem: oem || '—', desc: desc || '—',
+            image: fallbackSVG,
+            compatibility: app || '—'
+        });
+
+        renderPartAdminList();
+        renderHomeItems();
+        document.getElementById('partNameInput').value = '';
+        document.getElementById('partCodeInput').value = '';
+        document.getElementById('partPositionInput').value = '';
+        document.getElementById('partApplicationInput').value = '';
+        document.getElementById('partTypeInput').value = '';
+        document.getElementById('partOemInput').value = '';
+        document.getElementById('partDescInput').value = '';
+    }
+
+    function viewPart(id) {
+        const p = database.parts.find(x => x.id === id);
+        if (!p) return;
+        openViewModal('Peça', `
+            ${p.image ? `<img src="${p.image}" class="view-image" alt="${p.name}">` : ''}
+            <div class="view-grid">
+                <div class="view-item full"><div class="label">Nome</div><div class="value">${p.name}</div></div>
+                <div class="view-item"><div class="label">Código</div><div class="value">${p.code}</div></div>
+                <div class="view-item"><div class="label">Tipo</div><div class="value">${p.type}</div></div>
+                <div class="view-item"><div class="label">OEM</div><div class="value">${p.oem}</div></div>
+                <div class="view-item"><div class="label">Marca</div><div class="value">${p.brand}</div></div>
+                <div class="view-item"><div class="label">Aplicação</div><div class="value">${p.model}</div></div>
+                <div class="view-item full"><div class="label">Descrição</div><div class="value">${p.desc}</div></div>
+            </div>
+        `);
+    }
+
+    function editPart(id) {
+        const p = database.parts.find(x => x.id === id);
+        if (!p) return;
+        openEditModal('Editar Peça', `
+            <div class="input-group"><input type="text" id="edit_p_name" value="${p.name}" placeholder=" "><label>Nome</label></div>
+            <div class="input-group"><input type="text" id="edit_p_code" value="${p.code}" placeholder=" "><label>Código</label></div>
+            <div class="input-group"><input type="text" id="edit_p_type" value="${p.type}" placeholder=" "><label>Tipo</label></div>
+            <div class="input-group"><input type="text" id="edit_p_oem" value="${p.oem}" placeholder=" "><label>OEM</label></div>
+            <div class="input-group"><input type="text" id="edit_p_brand" value="${p.brand}" placeholder=" "><label>Marca</label></div>
+            <div class="input-group"><input type="text" id="edit_p_model" value="${p.model}" placeholder=" "><label>Aplicação</label></div>
+            <div class="input-group"><textarea id="edit_p_desc" placeholder=" ">${p.desc}</textarea><label>Descrição</label></div>
+        `, { type: 'part', id });
+    }
+
+    function deletePart(id) {
+        openConfirmModal('Tem certeza que deseja excluir esta peça?', () => {
+            database.parts = database.parts.filter(p => p.id !== id);
+            renderPartAdminList();
+            renderHomeItems();
+        });
+    }
+
+    function renderPartAdminList() {
+        const list = document.getElementById('partAdminList');
+        if (database.parts.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhuma peça.</p>';
+            return;
+        }
+        list.innerHTML = database.parts.map(p => `
+            <div class="list-item">
+                <div class="list-item-thumb">
+                    ${p.image ? `<img src="${p.image}" alt="${p.name}">` : `<i class="fas fa-cog"></i>`}
+                </div>
+                <div class="list-item-info">
+                    <strong>${p.name}</strong>
+                    <small>Cód: ${p.code} · ${p.brand}</small>
+                </div>
+                <div class="list-item-actions">
+                    <button class="icon-action view" onclick="viewPart(${p.id})" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="icon-action edit" onclick="editPart(${p.id})" title="Editar"><i class="fas fa-pen"></i></button>
+                    <button class="icon-action danger" onclick="deletePart(${p.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ==========================================================================
+       ADMIN — MÍDIAS (CRUD)
+       ========================================================================== */
+    function setupUpload() {
+        const area = document.getElementById('uploadArea');
+        const input = document.getElementById('fileInput');
+        const list = document.getElementById('fileList');
+
+        area.addEventListener('click', () => input.click());
+        area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('dragover'); });
+        area.addEventListener('dragleave', () => area.classList.remove('dragover'));
+        area.addEventListener('drop', (e) => { e.preventDefault(); area.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+        input.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedFiles.push({
+                        name: file.name,
+                        size: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+                        type: file.type,
+                        url: e.target.result
+                    });
+                    renderFileList();
+                };
+                if (file.type.startsWith('image/')) reader.readAsDataURL(file);
+                else {
+                    uploadedFiles.push({ name: file.name, size: (file.size / 1024 / 1024).toFixed(2) + ' MB', type: file.type, url: '#' });
+                    renderFileList();
+                }
+            });
+        }
+
+        function renderFileList() {
+            if (uploadedFiles.length === 0) { list.innerHTML = ''; return; }
+            list.innerHTML = uploadedFiles.map((f, i) => `
+                <div class="file-item">
+                    <i class="fas ${f.type.startsWith('image/') ? 'fa-image' : 'fa-file-pdf'}"></i>
+                    <span class="file-name">${f.name}</span>
+                    <small style="color: var(--text-muted);">${f.size}</small>
+                    <button class="remove-file" data-index="${i}"><i class="fas fa-times"></i></button>
+                </div>
+            `).join('');
+            list.querySelectorAll('.remove-file').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    uploadedFiles.splice(parseInt(btn.dataset.index), 1);
+                    renderFileList();
+                });
+            });
+        }
+    }
+
+    function saveMedia() {
+        if (uploadedFiles.length === 0) { alert('Nenhum arquivo.'); return; }
+        uploadedFiles.forEach((f, i) => {
+            database.media.push({
+                id: Date.now() + i,
+                name: f.name,
+                type: f.type.startsWith('image/') ? 'image' : 'pdf',
+                size: f.size,
+                url: f.url
+            });
+        });
+        uploadedFiles = [];
+        document.getElementById('fileList').innerHTML = '';
+        renderGallery();
+    }
+
+    function viewMedia(id) {
+        const m = database.media.find(x => x.id === id);
+        if (!m) return;
+        if (m.type === 'image' && m.url !== '#') {
+            openViewModal('Mídia', `<img src="${m.url}" class="view-image" alt="${m.name}"><div class="view-grid"><div class="view-item full"><div class="label">Nome</div><div class="value">${m.name}</div></div><div class="view-item"><div class="label">Tipo</div><div class="value">${m.type}</div></div><div class="view-item"><div class="label">Tamanho</div><div class="value">${m.size}</div></div></div>`);
+        } else {
+            openViewModal('Mídia', `<div class="view-grid"><div class="view-item full"><div class="label">Nome</div><div class="value">${m.name}</div></div><div class="view-item"><div class="label">Tipo</div><div class="value">${m.type}</div></div><div class="view-item"><div class="label">Tamanho</div><div class="value">${m.size}</div></div></div>`);
+        }
+    }
+
+    function editMedia(id) {
+        const m = database.media.find(x => x.id === id);
+        if (!m) return;
+        openEditModal('Editar Mídia', `
+            <div class="input-group"><input type="text" id="edit_md_name" value="${m.name}" placeholder=" "><label>Nome</label></div>
+        `, { type: 'media', id });
+    }
+
+    function deleteMedia(id) {
+        openConfirmModal('Tem certeza que deseja excluir esta mídia?', () => {
+            database.media = database.media.filter(m => m.id !== id);
+            renderGallery();
+        });
+    }
+
+    function renderGallery() {
+        const gallery = document.getElementById('galleryList');
+        if (database.media.length === 0) {
+            gallery.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Nenhuma mídia.</p>';
+            return;
+        }
+        gallery.innerHTML = database.media.map(m => `
+            <div class="list-item">
+                <div class="list-item-thumb">
+                    ${m.type === 'image' && m.url !== '#' ? `<img src="${m.url}" alt="${m.name}">` : `<i class="fas ${m.type === 'pdf' ? 'fa-file-pdf' : 'fa-image'}"></i>`}
+                </div>
+                <div class="list-item-info">
+                    <strong>${m.name}</strong>
+                    <small>${m.type.toUpperCase()} · ${m.size}</small>
+                </div>
+                <div class="list-item-actions">
+                    <button class="icon-action view" onclick="viewMedia(${m.id})" title="Visualizar"><i class="fas fa-eye"></i></button>
+                    <button class="icon-action edit" onclick="editMedia(${m.id})" title="Editar"><i class="fas fa-pen"></i></button>
+                    <button class="icon-action danger" onclick="deleteMedia(${m.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /* ==========================================================================
+       SALVAR EDIÇÃO
+       ========================================================================== */
+    function saveEdit() {
+        if (!editingContext) return;
+        const { type, id } = editingContext;
+
+        if (type === 'machine') {
+            const m = database.machines.find(x => x.id === id);
+            if (m) {
+                m.brand = document.getElementById('edit_m_brand').value;
+                m.model = document.getElementById('edit_m_model').value;
+                m.year = document.getElementById('edit_m_year').value;
+                m.category = document.getElementById('edit_m_category').value;
+            }
+            renderMachineList();
+        } else if (type === 'catalog') {
+            const c = database.catalogs.find(x => x.id === id);
+            if (c) {
+                c.system = document.getElementById('edit_c_system').value;
+                c.group = document.getElementById('edit_c_group').value;
+            }
+            renderCatalogAdminList();
+        } else if (type === 'part') {
+            const p = database.parts.find(x => x.id === id);
+            if (p) {
+                p.name = document.getElementById('edit_p_name').value;
+                p.code = document.getElementById('edit_p_code').value;
+                p.type = document.getElementById('edit_p_type').value;
+                p.oem = document.getElementById('edit_p_oem').value;
+                p.brand = document.getElementById('edit_p_brand').value;
+                p.model = document.getElementById('edit_p_model').value;
+                p.desc = document.getElementById('edit_p_desc').value;
+            }
+            renderPartAdminList();
+            renderHomeItems();
+        } else if (type === 'media') {
+            const m = database.media.find(x => x.id === id);
+            if (m) m.name = document.getElementById('edit_md_name').value;
+            renderGallery();
+        }
+
+        closeModal('editModal');
+        editingContext = null;
+    }
+
+    /* ==========================================================================
+       ORÇAMENTO E CÓPIA
+       ========================================================================== */
+    function openQuoteModal() {
+        if (!currentPart) return;
+        alert(`Orçamento solicitado para: ${currentPart.name}`);
+    }
+
+    function copyCode() {
+        if (!currentPart) return;
+        navigator.clipboard.writeText(currentPart.code).then(() => alert(`Código ${currentPart.code} copiado!`));
+    }
+
+    /* ==========================================================================
+       INICIALIZAÇÃO
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        setupUpload();
+        document.getElementById('micBtn').addEventListener('click', startVoice);
+        document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+
+        // Renderizar listas iniciais
+        renderHomeItems();
+        renderMachineList();
+        renderCatalogAdminList();
+        renderPartAdminList();
+        renderGallery();
+
+        // Abrir catálogo padrão
+        openCatalog('massey265', 'Hidráulico');
+    });
+</script>
+</body>
+</html>
